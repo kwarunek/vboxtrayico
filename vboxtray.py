@@ -39,6 +39,9 @@ def getVboxManageBin():
             return ("%s\VBoxManage.exe" % (winreg.QueryValue(key, 'InstallDir')))
         except:
             raise Exception('Unable to determine VirualBox install dir')
+    elif sys.platform == 'darwin':
+        # temp hardcoded
+        return '/Applications/VirtualBox.app/Contents/MacOS/VBoxManage'
     else:
         return "vboxmanage"
 
