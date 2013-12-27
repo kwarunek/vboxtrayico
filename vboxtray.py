@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#-*- coding:utf-8 -*-
 
 import re
 import subprocess
@@ -94,6 +95,9 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.setToolTip("VirtualBox Tray Console")
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
         QObject.connect(self, SIGNAL(traySignal), icon_activated)
+
+    def showMenu():
+        pass
 
     def loadIcon(self):
         bytearr = QByteArray.fromBase64(self.i)
