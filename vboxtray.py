@@ -7,11 +7,11 @@ import sys
 from subprocess import Popen
 try:
     from PySide.QtCore import SIGNAL, QObject, QByteArray
-    from PySide.QtGui import QIcon, QWidget, QApplication
+    from PySide.QtGui import QIcon, QWidget, QApplication, QCursor
     from PySide.QtGui import QMenu, QSystemTrayIcon, QPixmap
 except ImportError:
     from PyQt4.QtCore import SIGNAL, QObject, QByteArray
-    from PyQt4.QtGui import QIcon, QWidget, QApplication
+    from PyQt4.QtGui import QIcon, QWidget, QApplication, QCursor
     from PyQt4.QtGui import QMenu, QSystemTrayIcon, QPixmap
 
 
@@ -33,11 +33,6 @@ def getVboxManageBin():
         return '/Applications/VirtualBox.app/Contents/MacOS/VBoxManage'
     else:
         return "vboxmanage"
-
-
-def icon_activated(reason):
-    if reason == QSystemTrayIcon.DoubleClick:
-        subprocess.call(getVboxManageBin())
 
 
 class SystemTrayIcon(QSystemTrayIcon):
@@ -92,12 +87,13 @@ class SystemTrayIcon(QSystemTrayIcon):
         menu.addSeparator()
         menu.addAction("Exit", lambda: exit(0))
         self.setContextMenu(menu)
-        self.setToolTip("VirtualBox Tray Console")
+        self.setToolTip("VBox Tray")
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
-        QObject.connect(self, SIGNAL(traySignal), icon_activated)
+        QObject.connect(self, SIGNAL(traySignal), self.showMenu)
 
-    def showMenu():
-        pass
+    def showMenu(self, reason):
+        # show menu also on left click
+        self.contextMenu().exec_(QCursor.pos())
 
     def loadIcon(self):
         bytearr = QByteArray.fromBase64(self.i)
@@ -106,18 +102,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         return QIcon(pixmap)
 
     def refresh_menu(self):
-        running_vms = []
-        """
-        for v in list_vms('runningvms'):
-            running_vms.append(v)
-        for v in self.vms:
-            if v not in running_vms:
-                self.vms[v]['start'].setEnabled(True)
-                self.vms[v]['stop'].setDisabled(True)
-            else:
-                self.vms[v]['start'].setDisabled(True)
-                self.vms[v]['stop'].setEnabled(True)
-        """
+        pass
 
 
 class VBoxMenu(QMenu):
@@ -125,6 +110,9 @@ class VBoxMenu(QMenu):
     def __init__(self, name, parent):
         super(VBoxMenu, self).__init__(name, parent)
         self.vm_name = name
+        self.actions = {}
+        self.actions['start'] = self.addAction("Start", lambda: self.start())
+        self.actions['stop'] = self.addAction("Stop", lambda: self.stop())
 
     def start(self):
         self.manage(['startvm', '%s' % self.vm_name])
@@ -147,8 +135,6 @@ class VBoxMenu(QMenu):
         for v in cls.getVMList():
             submenu = cls(v, menu)
             cls.vms[v] = submenu
-            start = submenu.addAction("Start", lambda: submenu.start())
-            stop = submenu.addAction("Stop", lambda: submenu.stop())
             menu.addMenu(submenu)
         # self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
 
