@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-#EOL = '\r\n'
-EOL = '\n'
-
 import re
 import subprocess
 import sys
@@ -89,17 +86,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         icon = self.loadIcon()
         QSystemTrayIcon.__init__(self, icon, parent)
         menu = QMenu(parent)
-        self.vms = {}
-        for v in list_vms():
-            submenu = QMenu(v, menu)
-            self.vms[v] = {}
-            self.vms[v]['menu'] = submenu
-            start = submenu.addAction("Start", lambda vm=v: self.start_vm(vm))
-            self.vms[v]['start'] = start
-            stop = submenu.addAction("Stop", lambda vm=v: self.stop_vm(vm))
-            self.vms[v]['stop'] = stop
-            menu.addMenu(submenu)
-        self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
+        VBoxMenu.build(menu)
 
         menu.addSeparator()
         menu.addAction("Exit", lambda: exit(0))
@@ -114,16 +101,9 @@ class SystemTrayIcon(QSystemTrayIcon):
         pixmap.loadFromData(bytearr)
         return QIcon(pixmap)
 
-    def start_vm(self, vm):
-        self.showMessage("VirtualBox", "Starting %s" % vm)
-        vbox_manage(['startvm', '%s' % vm])
-
-    def stop_vm(self, vm):
-        self.showMessage("VirtualBox", "Stopping %s" % vm)
-        vbox_manage(['stopvm', '%s' % vm])
-
     def refresh_menu(self):
         running_vms = []
+        """
         for v in list_vms('runningvms'):
             running_vms.append(v)
         for v in self.vms:
@@ -133,34 +113,66 @@ class SystemTrayIcon(QSystemTrayIcon):
             else:
                 self.vms[v]['start'].setDisabled(True)
                 self.vms[v]['stop'].setEnabled(True)
+        """
+
+
+class VBoxMenu(QMenu):
+
+    def start(self):
+        self.manage(['startvm', '%s' % self.vm_name])
+
+    def start_headless(self):
+        self.manage(['startvm', '%s --type headless' % self.vm_name])
+
+    def stop(self):
+        self.manage(['stopvm', '%s' % self.vm_name])
+
+    def restart(self):
+        self.manage(['controlvm', '%s restart' % self.vm_name])
+
+    def poweroff(self):
+        self.manage(['controlvm', '%s poweroff' % self.vm_name])
+
+    @classmethod
+    def build(cls, menu):
+        cls.vms = {}
+        for v in cls.getVMList():
+            submenu = cls(v, menu)
+            cls.vms[v] = {}
+            cls.vms[v]['menu'] = submenu
+            start = submenu.addAction("Start", lambda vm=v: cls.vms[v].start())
+            cls.vms[v]['start'] = start
+            stop = submenu.addAction("Stop", lambda vm=v: cls.vms[v].stop())
+            cls.vms[v]['stop'] = stop
+            menu.addMenu(submenu)
+        # self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
+
+    @classmethod
+    def getVMList(cls, what="vms"):
+        vms = []
+        out = cls.manage(['list', what])
+        regex = re.compile(r'^"(.+)" {(.+)}')
+        for l in out:
+            m = regex.match(l)
+            if m:
+                vms.append(m.group(1))
+        return vms
+
+    @staticmethod
+    def manage(argv):
+        argv.insert(0, getVboxManageBin())
+        proc = Popen(argv, stdout=subprocess.PIPE)
+        (out, err) = proc.communicate()
+        return out.split("\n")
 
 
 def main():
     app = QApplication(sys.argv)
     w = QWidget()
-
     trayIcon = SystemTrayIcon(w)
-
     trayIcon.show()
     sys.exit(app.exec_())
 
-
-def vbox_manage(argv):
-    argv.insert(0, getVboxManageBin())
-    proc = Popen(argv, stdout=subprocess.PIPE)
-    (out, err) = proc.communicate()
-    return out.split(EOL)
-
-
-def list_vms(what='vms'):
-    vms = []
-    out = vbox_manage(['list', what])
-    regex = re.compile(r'^"(.+)" {(.+)}')
-    for l in out:
-        m = regex.match(l)
-        if m:
-            vms.append(m.group(1))
-    return vms
 
 if __name__ == "__main__":
     main()
