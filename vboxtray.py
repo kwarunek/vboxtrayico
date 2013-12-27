@@ -6,7 +6,6 @@ It's one of the features I missed from Microsoft's Virtual PC (not anymore)
 
 #########################################################################
 #VBOX_HOME = 'C:/Program Files/Sun/Virtualbox'
-VBOXMANAGE_BIN = 'vboxmanage'
 # VBOX_HOME = '/Applications/VirtualBox.app/Contents/MacOS'
 VBOX_PNG = "./icons/vbox.jpg"
 #EOL = '\r\n'
@@ -29,9 +28,24 @@ except ImportError:
 regex = re.compile(r'^"(.+)" {(.+)}')  # "VM name" {UUID}
 
 
+def getVboxManageBin():
+    if sys.platform == "win32":
+        try:
+            import _winreg as winreg
+        except:
+            import winreg
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 'SOFTWARE\\Oracle\\VirtualBox')
+            return ("%s\VBoxManage.exe" % (winreg.QueryValue(key, 'InstallDir')))
+        except:
+            raise Exception('Unable to determine VirualBox install dir')
+    else:
+        return "vboxmanage"
+
+
 def icon_activated(reason):
     if reason == QSystemTrayIcon.DoubleClick:
-        subprocess.call(VBOXMANAGE_BIN)
+        subprocess.call(getVboxManageBin())
 
 
 class SystemTrayIcon(QSystemTrayIcon):
@@ -89,7 +103,7 @@ def main():
 
 
 def vbox_manage(argv):
-    argv.insert(0, VBOXMANAGE_BIN)
+    argv.insert(0, getVboxManageBin())
     proc = Popen(argv, stdout=subprocess.PIPE)
     (out, err) = proc.communicate()
     return out.split(EOL)
