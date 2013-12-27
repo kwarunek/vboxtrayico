@@ -118,6 +118,10 @@ class SystemTrayIcon(QSystemTrayIcon):
 
 class VBoxMenu(QMenu):
 
+    def __init__(self, name, parent):
+        super(VBoxMenu, self).__init__(name, parent)
+        self.vm_name = name
+
     def start(self):
         self.manage(['startvm', '%s' % self.vm_name])
 
@@ -138,12 +142,9 @@ class VBoxMenu(QMenu):
         cls.vms = {}
         for v in cls.getVMList():
             submenu = cls(v, menu)
-            cls.vms[v] = {}
-            cls.vms[v]['menu'] = submenu
-            start = submenu.addAction("Start", lambda vm=v: cls.vms[v].start())
-            cls.vms[v]['start'] = start
-            stop = submenu.addAction("Stop", lambda vm=v: cls.vms[v].stop())
-            cls.vms[v]['stop'] = stop
+            cls.vms[v] = submenu
+            start = submenu.addAction("Start", lambda: submenu.start())
+            stop = submenu.addAction("Stop", lambda: submenu.stop())
             menu.addMenu(submenu)
         # self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
 
