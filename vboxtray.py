@@ -15,7 +15,7 @@ except ImportError:
     from PyQt4.QtGui import QMenu, QSystemTrayIcon, QPixmap
 
 
-def getVboxManageBin():
+def get_vbox_manage_bin():
     if sys.platform == "win32":
         try:
             import _winreg as winreg
@@ -86,6 +86,7 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         menu.addSeparator()
         menu.addAction("Exit", lambda: exit(0))
+        self.connect(menu, SIGNAL("aboutToShow()"), VBoxMenu.check_state)
         self.setContextMenu(menu)
         self.setToolTip("VBox Tray")
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
@@ -101,57 +102,69 @@ class SystemTrayIcon(QSystemTrayIcon):
         pixmap.loadFromData(bytearr)
         return QIcon(pixmap)
 
-    def refresh_menu(self):
-        pass
-
 
 class VBoxMenu(QMenu):
 
-    def __init__(self, name, parent):
+    def __init__(self, uuid, name, parent):
         super(VBoxMenu, self).__init__(name, parent)
         self.vm_name = name
+        self.uuid = uuid
         self.actions = {}
         self.actions['start'] = self.addAction("Start", lambda: self.start())
-        self.actions['stop'] = self.addAction("Stop", lambda: self.stop())
+        self.actions['start_headless'] = self.addAction("Start headless", lambda: self.start_headless())
+        self.actions['reset'] = self.addAction("Reset", lambda: self.reset())
+        self.actions['poweroff'] = self.addAction("Power off", lambda: self.poweroff())
 
     def start(self):
-        self.manage(['startvm', '%s' % self.vm_name])
+        self.manage(['startvm', '%s' % self.uuid])
 
     def start_headless(self):
-        self.manage(['startvm', '%s --type headless' % self.vm_name])
+        self.manage(['startvm', '--type', 'headless', '%s' % self.uuid])
 
-    def stop(self):
-        self.manage(['stopvm', '%s' % self.vm_name])
-
-    def restart(self):
-        self.manage(['controlvm', '%s restart' % self.vm_name])
+    def reset(self):
+        self.manage(['controlvm', '%s' % self.uuid, 'reset'])
 
     def poweroff(self):
-        self.manage(['controlvm', '%s poweroff' % self.vm_name])
+        self.manage(['controlvm', '%s' % self.uuid, 'poweroff'])
 
     @classmethod
     def build(cls, menu):
         cls.vms = {}
-        for v in cls.getVMList():
-            submenu = cls(v, menu)
-            cls.vms[v] = submenu
+        for k, v in cls.get_vm_list().iteritems():
+            submenu = cls(k, v, menu)
+            cls.vms[k] = submenu
             menu.addMenu(submenu)
         # self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
 
     @classmethod
-    def getVMList(cls, what="vms"):
-        vms = []
-        out = cls.manage(['list', what])
+    def get_vm_list(cls, objects="vms"):
+        vms = {}
+        out = cls.manage(['list', objects])
         regex = re.compile(r'^"(.+)" {(.+)}')
         for l in out:
             m = regex.match(l)
             if m:
-                vms.append(m.group(1))
+                vms[m.group(2)] = m.group(1)
         return vms
+
+    @classmethod
+    def check_state(cls):
+        running_vms = cls.get_vm_list('runningvms')
+        for uuid, vm in cls.vms.iteritems():
+            if uuid not in running_vms.keys():
+                vm.actions['start'].setEnabled(True)
+                vm.actions['start_headless'].setEnabled(True)
+                vm.actions['poweroff'].setDisabled(True)
+                vm.actions['reset'].setDisabled(True)
+            else:
+                vm.actions['start'].setDisabled(True)
+                vm.actions['start_headless'].setDisabled(True)
+                vm.actions['poweroff'].setEnabled(True)
+                vm.actions['reset'].setEnabled(True)
 
     @staticmethod
     def manage(argv):
-        argv.insert(0, getVboxManageBin())
+        argv.insert(0, get_vbox_manage_bin())
         proc = Popen(argv, stdout=subprocess.PIPE)
         (out, err) = proc.communicate()
         return out.split("\n")
