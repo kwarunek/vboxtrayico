@@ -5,14 +5,9 @@ import re
 import subprocess
 import sys
 from subprocess import Popen
-try:
-    from PySide.QtCore import SIGNAL, QObject, QByteArray
-    from PySide.QtGui import QIcon, QWidget, QApplication, QCursor
-    from PySide.QtGui import QMenu, QSystemTrayIcon, QPixmap
-except ImportError:
-    from PyQt4.QtCore import SIGNAL, QObject, QByteArray
-    from PyQt4.QtGui import QIcon, QWidget, QApplication, QCursor
-    from PyQt4.QtGui import QMenu, QSystemTrayIcon, QPixmap
+from PySide.QtCore import SIGNAL, QObject, QByteArray
+from PySide.QtGui import QIcon, QWidget, QApplication, QCursor
+from PySide.QtGui import QMenu, QSystemTrayIcon, QPixmap
 
 
 def get_vbox_manage_bin():
@@ -85,7 +80,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         VBoxMenu.build(menu)
 
         menu.addSeparator()
-        menu.addAction("Exit", lambda: exit(0))
+        menu.addAction("Exit", lambda: sys.exit(0))
         self.connect(menu, SIGNAL("aboutToShow()"), VBoxMenu.check_state)
         self.setContextMenu(menu)
         self.setToolTip("VBox Tray")
