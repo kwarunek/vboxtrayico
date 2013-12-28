@@ -76,14 +76,16 @@ class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
         icon = self.loadIcon()
         QSystemTrayIcon.__init__(self, icon, parent)
+
         menu = QMenu(parent)
         VBoxMenu.build(menu)
-
         menu.addSeparator()
         menu.addAction("Exit", lambda: sys.exit(0))
         self.connect(menu, SIGNAL("aboutToShow()"), VBoxMenu.check_state)
+
         self.setContextMenu(menu)
         self.setToolTip("VBox Tray")
+
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
         QObject.connect(self, SIGNAL(traySignal), self.showMenu)
 
@@ -102,10 +104,11 @@ class VBoxMenu(QMenu):
 
     def __init__(self, uuid, name, parent):
         super(VBoxMenu, self).__init__(name, parent)
+
         self.vm_name = name
         self.uuid = uuid
-        self.actions = {}
 
+        self.actions = {}
         self.actions['start'] = self.addAction("Start", lambda: self.start())
         self.actions['start_headless'] = self.addAction(
             "Start headless",
@@ -136,7 +139,6 @@ class VBoxMenu(QMenu):
             submenu = cls(k, v, menu)
             cls.vms[k] = submenu
             menu.addMenu(submenu)
-        # self.connect(menu, SIGNAL("aboutToShow()"), self.refresh_menu)
 
     @classmethod
     def get_vm_list(cls, objects="vms"):
