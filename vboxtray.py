@@ -110,10 +110,17 @@ class VBoxMenu(QMenu):
         self.vm_name = name
         self.uuid = uuid
         self.actions = {}
+
         self.actions['start'] = self.addAction("Start", lambda: self.start())
-        self.actions['start_headless'] = self.addAction("Start headless", lambda: self.start_headless())
+        self.actions['start_headless'] = self.addAction(
+            "Start headless",
+            lambda: self.start_headless()
+        )
         self.actions['reset'] = self.addAction("Reset", lambda: self.reset())
-        self.actions['poweroff'] = self.addAction("Power off", lambda: self.poweroff())
+        self.actions['poweroff'] = self.addAction(
+            "Power off",
+            lambda: self.poweroff()
+        )
 
     def start(self):
         self.manage(['startvm', '%s' % self.uuid])
