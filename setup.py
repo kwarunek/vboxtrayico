@@ -8,7 +8,7 @@ setup(
     author="kwarunek",
     author_email="kalmaceta@gmail.com",
     description="Virtualbox tray tool - list/start/stop VMs",
-    license="BSD",
+    license="MIT",
     keywords="virtualbox tray pysidel",
     url="https://github.com/kAlmAcetA/vboxtray",
     long_description='Virtualbox icon tray. Quick access start/stop VMs',
