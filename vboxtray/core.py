@@ -6,7 +6,7 @@ import subprocess
 import sys
 from subprocess import Popen
 from PySide.QtCore import SIGNAL, QObject, QByteArray
-from PySide.QtGui import QIcon, QWidget, QApplication, QCursor
+from PySide.QtGui import QIcon,  QCursor
 from PySide.QtGui import QMenu, QSystemTrayIcon, QPixmap
 
 
@@ -172,15 +172,3 @@ class VBoxMenu(QMenu):
         proc = Popen(argv, stdout=subprocess.PIPE)
         (out, err) = proc.communicate()
         return out.split("\n")
-
-
-def main():
-    app = QApplication(sys.argv)
-    w = QWidget()
-    trayIcon = SystemTrayIcon(w)
-    trayIcon.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == "__main__":
-    main()

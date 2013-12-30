@@ -8,7 +8,7 @@ except ImportError:
 setup(
     name="vboxtray",
     packages=['vboxtray'],
-    version="0.1.5",
+    version="0.1.6",
     author="Krzysztof Warunek",
     author_email="kalmaceta@gmail.com",
     description="Virtualbox tray tool - list/start/stop VMs",
@@ -16,7 +16,5 @@ setup(
     keywords="virtualbox tray vm pyside",
     url="https://github.com/kAlmAcetA/vboxtray",
     long_description='Virtualbox icon tray. Quick access start/stop VMs',
-    entry_points={
-        'console_scripts': ['vboxtray = vboxtray.core:main']
-    },
+    scripts=['scripts/vboxtray']
 )
