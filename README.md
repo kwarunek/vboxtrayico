@@ -11,6 +11,11 @@ cd vboxtray
 python setup.py install
 ```
 Moreover installer (MSI) for Windows will be provided in the future.
+
+License
+=======
+The MIT License (MIT). Full version in [LICENSE](https://github.com/kAlmAcetA/vboxtray/blob/master/LICENSE) file
+
 Credits
 =======
-Release 0.1.x is modifded (refactor, py3k compatibility, OOP) code based on https://github.com/dserodio/VBoxMenu.
+Release 0.1.x is modifided (refactor, py3k compatibility, OOP) code based on https://github.com/dserodio/VBoxMenu.
