@@ -13,4 +13,4 @@ python setup.py install
 Moreover installer (MSI) for Windows will be provided in the future.
 Credits
 =======
-Logic od first version based on https://github.com/dserodio/VBoxMenu.
+Release 0.1.x is modifded (refactor, py3k compatibility, OOP) code based on https://github.com/dserodio/VBoxMenu.
