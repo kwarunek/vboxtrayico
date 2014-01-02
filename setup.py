@@ -14,7 +14,7 @@ setup(
     description="Virtualbox tray tool - list/start/stop VMs",
     license="MIT",
     keywords="virtualbox tray vm pyside",
-    url="https://github.com/kAlmAcetA/vboxtray",
+    url="https://github.com/kAlmAcetA/vboxtrayico",
     long_description='Virtualbox icon tray. Quick access start/stop VMs',
     scripts=['scripts/vboxtrayico']
 )
