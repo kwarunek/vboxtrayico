@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import sys
-from vboxtray.core import SystemTrayIcon
+from vboxtrayico.core import SystemTrayIcon
 from PySide.QtGui import QWidget, QApplication
 
 def main():
