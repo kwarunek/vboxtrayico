@@ -20,7 +20,7 @@ def get_vbox_manage_bin():
             key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                                  'SOFTWARE\\Oracle\\VirtualBox')
             install_dir = winreg.QueryValueEx(key, 'InstallDir')
-            return ("%s\VBoxManage.exe" % (install_dir))
+            return ("%s\VBoxManage.exe" % (install_dir[0]))
         except:
             raise Exception('Unable to determine VirualBox install dir')
     elif sys.platform == 'darwin':

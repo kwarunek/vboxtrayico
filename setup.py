@@ -8,7 +8,7 @@ except ImportError:
 setup(
     name="vboxtrayico",
     packages=['vboxtrayico'],
-    version="0.1.7",
+    version="0.1.8",
     author="Krzysztof Warunek",
     author_email="kalmaceta@gmail.com",
     description="Virtualbox tray tool - list/start/stop VMs",
