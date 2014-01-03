@@ -135,7 +135,7 @@ class VBoxMenu(QMenu):
     @classmethod
     def build(cls, menu):
         cls.vms = {}
-        for k, v in cls.get_vm_list().iteritems():
+        for k, v in cls.get_vm_list().items():
             submenu = cls(k, v, menu)
             cls.vms[k] = submenu
             menu.addMenu(submenu)
@@ -154,7 +154,7 @@ class VBoxMenu(QMenu):
     @classmethod
     def check_state(cls):
         running_vms = cls.get_vm_list('runningvms')
-        for uuid, vm in cls.vms.iteritems():
+        for uuid, vm in cls.vms.items():
             if uuid not in running_vms.keys():
                 vm.actions['start'].setEnabled(True)
                 vm.actions['start_headless'].setEnabled(True)
@@ -171,4 +171,4 @@ class VBoxMenu(QMenu):
         argv.insert(0, get_vbox_manage_bin())
         proc = Popen(argv, stdout=subprocess.PIPE)
         (out, err) = proc.communicate()
-        return out.split("\n")
+        return out.decode().split("\n")
