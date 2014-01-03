@@ -1,4 +1,4 @@
-vboxtrayico
+VBoxTrayIco
 =======
 Tray icon to list/start/stop Virtualbox VMs.
 

@@ -84,7 +84,7 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.connect(menu, SIGNAL("aboutToShow()"), VBoxMenu.check_state)
 
         self.setContextMenu(menu)
-        self.setToolTip("VBox Tray")
+        self.setToolTip("VBoxTrayIco")
 
         traySignal = "activated(QSystemTrayIcon::ActivationReason)"
         QObject.connect(self, SIGNAL(traySignal), self.showMenu)
